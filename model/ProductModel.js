@@ -2,11 +2,15 @@ require('../database/config')
 const mongoose=require('mongoose')
 
 const productSchema=new mongoose.Schema({
-    name:String,
+    productname:String,
     price:Number,
     category:String,
     userID:String,
     company:String,
+    exportproduct:[String],
+    productImageName:String,
+    productImageUrl:String
+    
   
 })
 

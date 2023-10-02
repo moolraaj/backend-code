@@ -1,22 +1,45 @@
 require('../database/config')
 const ProductModel = require('../model/ProductModel')
+ 
 
+ const multer=require('multer')
+ const path=require('path')
 
+ const dirPathUploadsFirst=path.join(__dirname,'../uploads')
+ console.log(dirPathUploadsFirst)
 
-
-
-exports.productPost = async (req, resp) => {
+ exports.upload=multer({
+    
+    storage:multer.diskStorage({
+        destination:function(req,file,cb){
+            cb(null,dirPathUploadsFirst)
+        },
+        filename:function(req,file,cb){
+            cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`)
+        }
+    })
+}).single('upload')
+  
+exports.productPost=(async (req, resp) => {
     try {
-        const data = new ProductModel(req.body)
-        let result = await data.save()
-        resp.send(result)
-        console.log(result)
+        const data = new ProductModel({
+            productname: req.body.productname,
+            category: req.body.category,
+            price: req.body.price,
+            company:req.body.company,
+            userID: req.body.userID,
+            exportproduct:req.body.exportproduct,
+            productImageName: req.file.originalname,
+            productImageUrl: `http://localhost:1500/upload/${req.file.filename}`,
+        });
+
+        const savedData = await data.save();
+        resp.status(201).json(savedData);
+        console.log(savedData);
     } catch (error) {
-        resp.send('there is a problem in api')
+        resp.status(500).json({ error: 'Internal server error' });
     }
-
-
-}
+});
 
 exports.productGet = async (req, resp) => {
     try {
@@ -123,16 +146,4 @@ exports.productFilter = async (req, resp) => {
 
 
 
-
-exports.productPost = async (req, resp) => {
-    try {
-        const data = new ProductModel(req.body)
-        let result = await data.save()
-        resp.send(result)
-        console.log(result)
-    } catch (error) {
-        resp.send('there is a problem in api')
-    }
-
-
-}
+ 

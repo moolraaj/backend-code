@@ -1,24 +1,14 @@
-let express = require('express');
-const multer = require('multer');
+const express = require('express');
 const imageController = require('../controller/imageUploadController');
+const upload = require('../controller/imageUploadController').upload;
 
-let router = express.Router();
+const router = express.Router();
+
  
-
-
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './uploads');
-  },
-  filename: function (req, file, cb) {
-    const fileExtension = file.originalname.split('.').pop();
-    cb(null, `${file.fieldname}-${Date.now()}.${fileExtension}`);
-  },
-});
-
-const upload = multer({ storage: storage }).single('snapshorts');
+router.use('/profile', express.static('./uploads'));
 
 router.post('/', upload, imageController.uploadImagePost);
+router.get('/', imageController.uploadImageGet);
 
-exports.router = router;
+module.exports = router;
+
